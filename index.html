@@ -26,7 +26,6 @@
       font-family: 'Inter', 'Noto Sans Bengali', -apple-system, sans-serif;
     }
 
-    /* custom scroll — RGB glow */
     ::-webkit-scrollbar { width: 5px; height: 5px; }
     ::-webkit-scrollbar-track { background: #131824; border-radius: 20px; }
     ::-webkit-scrollbar-thumb { 
@@ -35,7 +34,6 @@
       box-shadow: 0 0 16px rgba(255, 59, 111, 0.3);
     }
 
-    /* header — glass with RGB border float */
     header {
       background: rgba(13, 17, 28, 0.75);
       backdrop-filter: blur(18px);
@@ -71,7 +69,6 @@
       min-width: 200px;
     }
 
-    /* logo — RGB gradient text + glow */
     .logo {
       font-size: 26px;
       font-weight: 800;
@@ -109,7 +106,6 @@
       100% { transform: rotate(360deg); }
     }
 
-    /* Bangla headline — glass with RGB border */
     .headline-bangla {
       font-size: 17px;
       font-weight: 700;
@@ -150,7 +146,6 @@
       50% { transform: scale(1.2); opacity: 1; }
     }
 
-    /* main layout */
     .main-grid {
       display: flex;
       flex: 1;
@@ -162,7 +157,6 @@
       min-height: 0;
     }
 
-    /* left column: player */
     .player-col {
       flex: 1.3;
       min-width: 0;
@@ -265,7 +259,6 @@
       transform: scale(1.08) rotate(6deg);
     }
 
-    /* right column: channel list — premium glass RGB */
     .list-col {
       flex: 1;
       min-width: 260px;
@@ -336,7 +329,6 @@
       border-color: #ff9f43;
     }
 
-    /* category pills — RGB */
     .category-scroll {
       display: flex;
       gap: 8px;
@@ -380,7 +372,6 @@
       box-shadow: 0 6px 28px rgba(255, 59, 111, 0.35);
     }
 
-    /* channel list */
     .channel-list {
       flex: 1;
       overflow-y: auto;
@@ -529,7 +520,6 @@
       100% { opacity: 1; transform: scale(1); }
     }
 
-    /* responsive */
     @media (max-width: 920px) {
       .main-grid {
         flex-direction: column;
@@ -593,7 +583,6 @@
 </header>
 
 <div class="main-grid">
-  <!-- left: player -->
   <div class="player-col">
     <div class="video-wrapper">
       <video id="video" controls autoplay playsinline></video>
@@ -604,7 +593,6 @@
     </div>
   </div>
 
-  <!-- right: channel list -->
   <div class="list-col">
     <div class="list-header">
       <h2><i class="fas fa-list-ul"></i> Channel List</h2>
@@ -628,7 +616,7 @@
         name: "Somoy TV",
         category: "News",
         logo: "https://images.seeklogo.com/logo-png/53/1/somoy-tv-logo-png_seeklogo-536972.png",
-        url: "https://tinyurl.com/4slivetvsomoy"
+        url: "http://103.13.193.13:8082/SOMOY.TV.HD/video.m3u8?token=o_tOMJkN-G6XL3"
       },
       {
         name: "T Sports",
