@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>4S LIVE TV · RGB Neon UI</title>
+  <!-- HLS.js -->
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Google Font: Noto Sans Bengali + Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Bengali:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #0b0d15;
+      color: #f0f4ff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      font-family: 'Inter', 'Noto Sans Bengali', -apple-system, sans-serif;
+    }
+
+    /* custom scroll — RGB glow */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: #131824; border-radius: 20px; }
+    ::-webkit-scrollbar-thumb { 
+      background: linear-gradient(180deg, #ff3b6f, #ff9f43, #2ed573, #1e90ff, #a855f7);
+      border-radius: 20px;
+      box-shadow: 0 0 16px rgba(255, 59, 111, 0.3);
+    }
+
+    /* header — glass with RGB border float */
+    header {
+      background: rgba(13, 17, 28, 0.75);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      padding: 14px 32px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      z-index: 10;
+      position: sticky;
+      top: 0;
+      gap: 20px;
+      flex-wrap: wrap;
+      animation: rgbBorderPulse 4s ease-in-out infinite, floatHeader 6s ease-in-out infinite;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+    }
+    @keyframes rgbBorderPulse {
+      0% { border-bottom-color: #ff3b6f; box-shadow: 0 4px 28px rgba(255, 59, 111, 0.15); }
+      33% { border-bottom-color: #ff9f43; box-shadow: 0 4px 28px rgba(255, 159, 67, 0.15); }
+      66% { border-bottom-color: #2ed573; box-shadow: 0 4px 28px rgba(46, 213, 115, 0.15); }
+      100% { border-bottom-color: #1e90ff; box-shadow: 0 4px 28px rgba(30, 144, 255, 0.15); }
+    }
+    @keyframes floatHeader {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-2px); }
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex: 1;
+      min-width: 200px;
+    }
+
+    /* logo — RGB gradient text + glow */
+    .logo {
+      font-size: 26px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ff3b6f, #ff9f43, #2ed573, #1e90ff, #a855f7);
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: -0.5px;
+      animation: rgbShimmer 5s ease-in-out infinite, glowPulse 3s ease-in-out infinite;
+      filter: drop-shadow(0 0 18px rgba(255, 59, 111, 0.2));
+    }
+    @keyframes rgbShimmer {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    @keyframes glowPulse {
+      0%, 100% { filter: drop-shadow(0 0 12px rgba(255, 59, 111, 0.2)); }
+      50% { filter: drop-shadow(0 0 28px rgba(30, 144, 255, 0.4)); }
+    }
+    .logo i {
+      -webkit-text-fill-color: transparent;
+      background: linear-gradient(135deg, #ff9f43, #ff3b6f);
+      -webkit-background-clip: text;
+      background-clip: text;
+      font-size: 28px;
+      animation: spinSlow 12s linear infinite;
+    }
+    @keyframes spinSlow {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Bangla headline — glass with RGB border */
+    .headline-bangla {
+      font-size: 17px;
+      font-weight: 700;
+      color: #f0f4ff;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 6px 24px;
+      border-radius: 100px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: 'Noto Sans Bengali', sans-serif;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      transition: 0.4s ease;
+      animation: rgbBorderGlow 4s ease-in-out infinite;
+    }
+    @keyframes rgbBorderGlow {
+      0% { border-color: #ff3b6f; box-shadow: 0 0 20px rgba(255, 59, 111, 0.1); }
+      33% { border-color: #ff9f43; box-shadow: 0 0 20px rgba(255, 159, 67, 0.1); }
+      66% { border-color: #2ed573; box-shadow: 0 0 20px rgba(46, 213, 115, 0.1); }
+      100% { border-color: #1e90ff; box-shadow: 0 0 20px rgba(30, 144, 255, 0.1); }
+    }
+    .headline-bangla:hover {
+      transform: scale(1.02);
+      border-color: #ff9f43;
+      box-shadow: 0 0 40px rgba(255, 159, 67, 0.2);
+    }
+    .headline-bangla i {
+      color: #ff9f43;
+      font-size: 16px;
+      animation: pulseIcon 2s ease-in-out infinite;
+    }
+    @keyframes pulseIcon {
+      0%, 100% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.2); opacity: 1; }
+    }
+
+    /* main layout */
+    .main-grid {
+      display: flex;
+      flex: 1;
+      gap: 28px;
+      padding: 24px 32px 32px 32px;
+      max-width: 1480px;
+      margin: 0 auto;
+      width: 100%;
+      min-height: 0;
+    }
+
+    /* left column: player */
+    .player-col {
+      flex: 1.3;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .video-wrapper {
+      position: relative;
+      background: #0b0e16;
+      border-radius: 32px;
+      overflow: hidden;
+      box-shadow: 0 24px 64px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      transition: 0.5s cubic-bezier(0.2, 0.9, 0.4, 1);
+      animation: rgbShadowPulse 5s ease-in-out infinite;
+    }
+    @keyframes rgbShadowPulse {
+      0% { box-shadow: 0 24px 64px -12px rgba(255, 59, 111, 0.15), 0 0 0 1px rgba(255, 59, 111, 0.1); }
+      33% { box-shadow: 0 24px 64px -12px rgba(255, 159, 67, 0.15), 0 0 0 1px rgba(255, 159, 67, 0.1); }
+      66% { box-shadow: 0 24px 64px -12px rgba(46, 213, 115, 0.15), 0 0 0 1px rgba(46, 213, 115, 0.1); }
+      100% { box-shadow: 0 24px 64px -12px rgba(30, 144, 255, 0.15), 0 0 0 1px rgba(30, 144, 255, 0.1); }
+    }
+    .video-wrapper:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 28px 72px -12px rgba(255, 159, 67, 0.2);
+    }
+    video {
+      display: block;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #000;
+      border-radius: 32px;
+      max-height: 480px;
+      object-fit: contain;
+      transition: transform 0.4s ease;
+    }
+    video:hover {
+      transform: scale(1.005);
+    }
+
+    .player-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 16px;
+      padding: 0 6px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .channel-indicator {
+      color: #c8d0e6;
+      font-size: 14px;
+      background: rgba(18, 24, 38, 0.8);
+      backdrop-filter: blur(12px);
+      padding: 8px 24px;
+      border-radius: 40px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      font-family: 'Noto Sans Bengali', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 500;
+      transition: 0.3s ease;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+    .channel-indicator i {
+      color: #ff9f43;
+      font-size: 13px;
+      animation: pulseDot 1.8s ease-in-out infinite;
+    }
+    @keyframes pulseDot {
+      0%, 100% { opacity: 0.4; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1.4); }
+    }
+
+    .fullscreen-btn {
+      background: rgba(18, 24, 38, 0.8);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 8px 16px;
+      border-radius: 40px;
+      color: #c8d0e6;
+      font-size: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: 0.3s cubic-bezier(0.2, 0.9, 0.4, 1);
+      width: 48px;
+      height: 48px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+    .fullscreen-btn:hover {
+      background: linear-gradient(135deg, #ff3b6f, #ff9f43);
+      color: #0b0d15;
+      border-color: transparent;
+      box-shadow: 0 4px 32px rgba(255, 59, 111, 0.4);
+      transform: scale(1.08) rotate(6deg);
+    }
+
+    /* right column: channel list — premium glass RGB */
+    .list-col {
+      flex: 1;
+      min-width: 260px;
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      background: rgba(13, 17, 28, 0.6);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 32px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      padding: 22px 20px 20px 20px;
+      height: fit-content;
+      max-height: 640px;
+      box-shadow: 0 24px 56px -16px rgba(0, 0, 0, 0.7);
+      transition: 0.4s cubic-bezier(0.2, 0.9, 0.4, 1);
+      animation: rgbBorderFloat 7s ease-in-out infinite;
+    }
+    @keyframes rgbBorderFloat {
+      0%, 100% { border-color: rgba(255, 59, 111, 0.15); box-shadow: 0 24px 56px -16px rgba(255, 59, 111, 0.05); }
+      33% { border-color: rgba(255, 159, 67, 0.15); box-shadow: 0 24px 56px -16px rgba(255, 159, 67, 0.05); }
+      66% { border-color: rgba(46, 213, 115, 0.15); box-shadow: 0 24px 56px -16px rgba(46, 213, 115, 0.05); }
+      100% { border-color: rgba(30, 144, 255, 0.15); box-shadow: 0 24px 56px -16px rgba(30, 144, 255, 0.05); }
+    }
+    .list-col:hover {
+      border-color: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 28px 64px -12px rgba(255, 159, 67, 0.08);
+    }
+
+    .list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding: 0 4px;
+    }
+    .list-header h2 {
+      font-size: 19px;
+      font-weight: 700;
+      color: #f0f4ff;
+      font-family: 'Noto Sans Bengali', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      letter-spacing: -0.2px;
+    }
+    .list-header h2 i {
+      background: linear-gradient(135deg, #ff3b6f, #ff9f43);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-size: 20px;
+      animation: pulseIcon 2.4s ease-in-out infinite;
+    }
+    .list-header .count-badge {
+      font-size: 12px;
+      color: #a8b2d1;
+      background: rgba(18, 24, 38, 0.7);
+      padding: 4px 16px;
+      border-radius: 40px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      font-weight: 600;
+      transition: 0.3s ease;
+    }
+    .list-header .count-badge:hover {
+      background: rgba(255, 159, 67, 0.1);
+      color: #ff9f43;
+      border-color: #ff9f43;
+    }
+
+    /* category pills — RGB */
+    .category-scroll {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 2px 2px 14px 2px;
+      scrollbar-width: thin;
+      flex-shrink: 0;
+    }
+    .category-scroll button {
+      background: rgba(18, 24, 38, 0.6);
+      color: #a8b2d1;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      padding: 6px 20px;
+      border-radius: 40px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 12px;
+      transition: 0.3s cubic-bezier(0.2, 0.9, 0.4, 1);
+      white-space: nowrap;
+      flex-shrink: 0;
+      font-family: 'Noto Sans Bengali', sans-serif;
+      backdrop-filter: blur(4px);
+    }
+    .category-scroll button.active {
+      background: linear-gradient(135deg, #ff3b6f, #ff9f43);
+      color: #0b0d15;
+      border-color: transparent;
+      box-shadow: 0 4px 20px rgba(255, 59, 111, 0.25);
+      font-weight: 700;
+      transform: scale(1.02);
+    }
+    .category-scroll button:hover {
+      background: rgba(255, 255, 255, 0.06);
+      color: #f0f4ff;
+      border-color: rgba(255, 255, 255, 0.1);
+      transform: translateY(-2px);
+    }
+    .category-scroll button.active:hover {
+      background: linear-gradient(135deg, #ff3b6f, #ff9f43);
+      transform: scale(1.05) translateY(-2px);
+      box-shadow: 0 6px 28px rgba(255, 59, 111, 0.35);
+    }
+
+    /* channel list */
+    .channel-list {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 2px;
+      max-height: 420px;
+    }
+
+    .channel-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: rgba(18, 24, 38, 0.4);
+      backdrop-filter: blur(4px);
+      padding: 8px 14px 8px 10px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: 0.35s cubic-bezier(0.2, 0.9, 0.4, 1);
+      border: 1px solid rgba(255, 255, 255, 0.02);
+      animation: itemAppear 0.5s ease backwards;
+    }
+    .channel-item:nth-child(1) { animation-delay: 0.02s; }
+    .channel-item:nth-child(2) { animation-delay: 0.06s; }
+    .channel-item:nth-child(3) { animation-delay: 0.10s; }
+    .channel-item:nth-child(4) { animation-delay: 0.14s; }
+    .channel-item:nth-child(5) { animation-delay: 0.18s; }
+    .channel-item:nth-child(6) { animation-delay: 0.22s; }
+    .channel-item:nth-child(7) { animation-delay: 0.26s; }
+    .channel-item:nth-child(8) { animation-delay: 0.30s; }
+    .channel-item:nth-child(9) { animation-delay: 0.34s; }
+    .channel-item:nth-child(10) { animation-delay: 0.38s; }
+
+    @keyframes itemAppear {
+      0% { opacity: 0; transform: translateX(-16px) scale(0.94); }
+      100% { opacity: 1; transform: translateX(0) scale(1); }
+    }
+
+    .channel-item:hover {
+      background: rgba(30, 40, 60, 0.7);
+      border-color: rgba(255, 159, 67, 0.3);
+      transform: translateX(8px) scale(1.01);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+    .channel-item img {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 14px;
+      padding: 5px;
+      flex-shrink: 0;
+      filter: drop-shadow(0 2px 12px rgba(0, 0, 0, 0.5));
+      transition: 0.3s ease;
+    }
+    .channel-item:hover img {
+      transform: scale(1.06) rotate(-2deg);
+      filter: drop-shadow(0 4px 20px rgba(255, 159, 67, 0.2));
+    }
+    .channel-item .info {
+      flex: 1;
+      min-width: 0;
+    }
+    .channel-item .info h4 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #f0f4ff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-family: 'Noto Sans Bengali', sans-serif;
+      transition: 0.2s;
+    }
+    .channel-item:hover .info h4 {
+      background: linear-gradient(135deg, #ff9f43, #ff3b6f);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .channel-item .info .badge {
+      font-size: 10px;
+      color: #ff9f43;
+      background: rgba(255, 159, 67, 0.08);
+      padding: 0px 14px;
+      border-radius: 30px;
+      display: inline-block;
+      margin-top: 3px;
+      border: 1px solid rgba(255, 159, 67, 0.08);
+      font-weight: 500;
+      font-family: 'Noto Sans Bengali', sans-serif;
+      transition: 0.3s;
+    }
+    .channel-item:hover .info .badge {
+      background: rgba(255, 159, 67, 0.12);
+      border-color: rgba(255, 159, 67, 0.2);
+    }
+    .channel-item .live-dot {
+      color: #2ed573;
+      font-size: 10px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(46, 213, 115, 0.06);
+      padding: 2px 14px 2px 8px;
+      border-radius: 40px;
+      border: 1px solid rgba(46, 213, 115, 0.08);
+      font-weight: 600;
+      font-size: 9px;
+      letter-spacing: 0.3px;
+      flex-shrink: 0;
+      transition: 0.3s;
+    }
+    .channel-item:hover .live-dot {
+      background: rgba(46, 213, 115, 0.1);
+      border-color: #2ed573;
+      box-shadow: 0 0 24px rgba(46, 213, 115, 0.1);
+    }
+    .channel-item .live-dot i {
+      font-size: 7px;
+      animation: pulse-dot 1.6s ease-in-out infinite;
+      color: #2ed573;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 0.3; transform: scale(0.6); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 40px 10px;
+      color: #6a7a9a;
+      font-size: 14px;
+      font-family: 'Noto Sans Bengali', sans-serif;
+      animation: fadeIn 0.5s ease;
+    }
+    .no-results i {
+      font-size: 32px;
+      opacity: 0.2;
+      display: block;
+      margin-bottom: 12px;
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: scale(0.9); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    /* responsive */
+    @media (max-width: 920px) {
+      .main-grid {
+        flex-direction: column;
+        padding: 16px 20px 24px;
+        gap: 20px;
+      }
+      .list-col {
+        max-width: 100%;
+        max-height: 420px;
+        padding: 16px 14px;
+        animation: none;
+      }
+      .channel-list {
+        max-height: 220px;
+      }
+      video {
+        max-height: 320px;
+      }
+      .player-col { flex: unset; }
+      .headline-bangla {
+        font-size: 15px;
+        padding: 4px 16px;
+      }
+      header {
+        padding: 12px 20px;
+        gap: 12px;
+        animation: rgbBorderPulse 4s ease-in-out infinite;
+      }
+    }
+    @media (max-width: 580px) {
+      header { padding: 10px 14px; gap: 8px; }
+      .logo { font-size: 20px; }
+      .logo i { font-size: 22px; }
+      .headline-bangla {
+        font-size: 12px;
+        padding: 4px 12px;
+        gap: 6px;
+      }
+      .headline-bangla i { font-size: 12px; }
+      .header-left { gap: 10px; flex-wrap: wrap; }
+      .main-grid { padding: 12px 12px 20px; gap: 14px; }
+      .player-controls { flex-direction: column; align-items: stretch; gap: 8px; }
+      .fullscreen-btn { width: 100%; height: 44px; }
+      .channel-item img { width: 40px; height: 40px; }
+      .list-col { max-height: 380px; padding: 12px 10px; }
+      .channel-list { max-height: 170px; }
+      video { max-height: 240px; border-radius: 24px; }
+      .video-wrapper { border-radius: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <div class="logo"><i class="fas fa-play-circle"></i> 4S LIVE TV</div>
+    <div class="headline-bangla">
+      <i class="fas fa-tower-broadcast"></i> ইন্টারনেট সংযোগ পেতে কল করুন: ইয়াসিন ০১৩২৫৭৩০৫৫৮, ০১৩২৭৮০৪৯১৪
+    </div>
+  </div>
+</header>
+
+<div class="main-grid">
+  <!-- left: player -->
+  <div class="player-col">
+    <div class="video-wrapper">
+      <video id="video" controls autoplay playsinline></video>
+    </div>
+    <div class="player-controls">
+      <span class="channel-indicator" id="channelIndicator"><i class="fas fa-broadcast"></i> Somoy TV</span>
+      <button class="fullscreen-btn" onclick="openFullscreen()" aria-label="Fullscreen"><i class="fas fa-expand"></i></button>
+    </div>
+  </div>
+
+  <!-- right: channel list -->
+  <div class="list-col">
+    <div class="list-header">
+      <h2><i class="fas fa-list-ul"></i> Channel List</h2>
+      <span class="count-badge" id="channelCount">0</span>
+    </div>
+    <div class="category-scroll" id="categoryContainer">
+      <button class="active" data-cat="All">All</button>
+      <button data-cat="News">News</button>
+      <button data-cat="Sports">Sports</button>
+      <button data-cat="Entertainment">Entertainment</button>
+      <button data-cat="Movies">Movies</button>
+    </div>
+    <div class="channel-list" id="channelList"></div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    const channels = [
+      {
+        name: "Somoy TV",
+        category: "News",
+        logo: "https://images.seeklogo.com/logo-png/53/1/somoy-tv-logo-png_seeklogo-536972.png",
+        url: "http://103.13.193.13:8082/SOMOY.TV.HD/video.m3u8?token=o_tOMJkN-G6XL3"
+      },
+      {
+        name: "T Sports",
+        category: "Sports",
+        logo: "https://images.seeklogo.com/logo-png/64/1/t-sports-logo-png_seeklogo-640172.png",
+        url: "http://103.13.193.13:8082/T.SPORTS.HD/video.m3u8?token=o_tOMJkN-G6XL3"
+      },
+      {
+        name: "PTV Sports",
+        category: "Sports",
+        logo: "https://e7.pngegg.com/pngimages/13/246/png-clipart-logo-ptv-sports-television-channel-pakistan-cricket-television-text.png",
+        url: "http://103.13.193.13:8082/PTV-SPORTS-HD/video.m3u8?token=o_tOMJkN-G6XL3"
+      }
+    ];
+
+    const video = document.getElementById('video');
+    const channelList = document.getElementById('channelList');
+    const categoryBtns = document.querySelectorAll('#categoryContainer button');
+    const channelIndicator = document.getElementById('channelIndicator');
+    const channelCount = document.getElementById('channelCount');
+
+    let currentCategory = 'All';
+    let hlsInstance = null;
+
+    function renderChannelList(list) {
+      channelList.innerHTML = '';
+      channelCount.textContent = list.length;
+      if (!list.length) {
+        channelList.innerHTML = `<div class="no-results"><i class="fas fa-tv"></i>কোনো চ্যানেল পাওয়া যায়নি</div>`;
+        return;
+      }
+      list.forEach((ch, index) => {
+        const item = document.createElement('div');
+        item.className = 'channel-item';
+        item.style.animationDelay = `${0.04 * index}s`;
+        item.innerHTML = `
+          <img src="${ch.logo}" alt="${ch.name}" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22 viewBox=%220 0 100 100%22%3E%3Crect width=%22100%22 height=%22100%22 fill=%22%23131a28%22/%3E%3Ctext x=%2250%22 y=%2255%22 font-size=%2214%22 text-anchor=%22middle%22 fill=%22%236a7a9a%22 font-family=%22sans-serif%22%3E${ch.name[0]}%3C/text%3E%3C/svg%3E'">
+          <div class="info">
+            <h4>${ch.name}</h4>
+            <span class="badge">${ch.category}</span>
+          </div>
+          <div class="live-dot"><i class="fas fa-circle"></i> LIVE</div>
+        `;
+        item.addEventListener('click', () => playChannel(ch.url, ch.name));
+        channelList.appendChild(item);
+      });
+    }
+
+    function playChannel(url, channelName) {
+      if (channelName) {
+        channelIndicator.innerHTML = `<i class="fas fa-broadcast"></i> ${channelName}`;
+      }
+      if (hlsInstance) {
+        hlsInstance.destroy();
+        hlsInstance = null;
+      }
+      if (Hls.isSupported()) {
+        hlsInstance = new Hls({ enableWorker: true, lowLatencyMode: true });
+        hlsInstance.loadSource(url);
+        hlsInstance.attachMedia(video);
+        hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => {
+          video.play().catch(() => {});
+        });
+        hlsInstance.on(Hls.Events.ERROR, (event, data) => {
+          if (data.fatal) {
+            video.src = url;
+          }
+        });
+      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = url;
+      } else {
+        video.src = url;
+      }
+      video.autoplay = true;
+    }
+
+    function filterCategory(category) {
+      currentCategory = category;
+      categoryBtns.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.cat === category);
+      });
+      applyFilters();
+    }
+
+    function applyFilters() {
+      let filtered = [...channels];
+      if (currentCategory !== 'All') {
+        filtered = filtered.filter(c => c.category === currentCategory);
+      }
+      renderChannelList(filtered);
+    }
+
+    categoryBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterCategory(btn.dataset.cat);
+      });
+    });
+
+    window.openFullscreen = function() {
+      const videoEl = document.getElementById('video');
+      if (videoEl.requestFullscreen) {
+        videoEl.requestFullscreen().catch(() => {});
+      } else if (videoEl.webkitRequestFullscreen) {
+        videoEl.webkitRequestFullscreen();
+      }
+    };
+
+    const defaultChannel = channels[0];
+    playChannel(defaultChannel.url, defaultChannel.name);
+    renderChannelList(channels);
+  })();
+</script>
+</body>
+</html>
